@@ -10,10 +10,8 @@ RUN apt-get update && \
 RUN rm -rf /var/lib/apt/lists/ /var/cache/apt/archives/ /tmp/*
 # Клонируем репозиторий Hikka
 RUN git clone https://github.com/Plovchikdeval/Heroku /Hikka
-# Создаем виртуальное окружение Python
-RUN python -m venv /venv
 # Устанавливаем зависимости проекта
-RUN /venv/bin/pip install --no-warn-script-location --no-cache-dir -r /Hikka/requirements.txt
+RUN pip install --no-warn-script-location --no-cache-dir -r /Hikka/requirements.txt
 
 # -------------------------------
 # Используем другой базовый образ  для работы приложения
@@ -35,7 +33,6 @@ ENV DOCKER=true \
     GIT_PYTHON_REFRESH=quiet \
     PIP_NO_CACHE_DIR=1
 # Копируем собранное приложение и виртуальное окружение из этапа сборки
-COPY /venv /Hikka/venv
 # Устанавливаем рабочую директорию
 WORKDIR /Hikka
 # Открываем порт 8080 для доступа к приложению
