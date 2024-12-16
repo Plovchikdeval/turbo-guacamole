@@ -16,9 +16,7 @@ RUN python -m venv /venv
 RUN /venv/bin/pip install --no-warn-script-location --no-cache-dir -r /Hikka/requirements.txt
 
 # -------------------------------
-# Используем другой базовый образ для финального контейнера
-FROM python:3.10-slim
-# Устанавливаем необходимые пакеты для работы приложения
+# Используем другой базовый образ  для работы приложения
 RUN apt-get update && \
     apt-get install -y --no-install-recommends --fix-missing \
     curl libcairo2 git ffmpeg libmagic1 \
@@ -37,7 +35,6 @@ ENV DOCKER=true \
     GIT_PYTHON_REFRESH=quiet \
     PIP_NO_CACHE_DIR=1
 # Копируем собранное приложение и виртуальное окружение из этапа сборки
-COPY /Hikka /Hikka
 COPY /venv /Hikka/venv
 # Устанавливаем рабочую директорию
 WORKDIR /Hikka
