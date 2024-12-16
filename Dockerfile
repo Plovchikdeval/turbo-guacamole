@@ -37,8 +37,8 @@ ENV DOCKER=true \
     GIT_PYTHON_REFRESH=quiet \
     PIP_NO_CACHE_DIR=1
 # Копируем собранное приложение и виртуальное окружение из этапа сборки
-COPY --from=builder /Hikka /Hikka
-COPY --from=builder /venv /Hikka/venv
+COPY /Hikka /Hikka
+COPY /venv /Hikka/venv
 # Устанавливаем рабочую директорию
 WORKDIR /Hikka
 # Открываем порт 8080 для доступа к приложению
