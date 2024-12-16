@@ -29,6 +29,7 @@ RUN curl -sL https://deb.nodesource.com/setup_18.x -o nodesource_setup.sh && \
 RUN rm -rf /var/lib/apt/lists/ /var/cache/apt/archives/ /tmp/*
 # Устанавливаем переменные окружения для работы приложения
 ENV DOCKER=true \
+    IS_DJHOST=true \
     rate=basic \
     GIT_PYTHON_REFRESH=quiet \
     PIP_NO_CACHE_DIR=1
