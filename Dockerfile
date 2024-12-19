@@ -1,43 +1,43 @@
-# -------------------------------
-# Используем базовый образ Ubuntu 20.04
-FROM ubuntu:20.04
+FROM python:3.8-slim as python-base
 
-# Отключаем интерактивный режим apt для предотвращения зависаний при установке
-ENV DEBIAN_FRONTEND=noninteractive
-ENV PIP_NO_CACHE_DIR=1
+ENV DOCKER=true
 
-# Устанавливаем необходимые пакеты для сборки Python, git и зависимостей
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    python3.10 python3-pip python3-dev \
-    gcc git curl libcairo2 ffmpeg libmagic1 \
-    libavcodec-dev libavutil-dev libavformat-dev \
-    libswscale-dev libavdevice-dev neofetch wkhtmltopdf nodejs npm && \
-    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/*
+ENV DJ_HOST=true
 
-# Устанавливаем Node.js 18
-RUN curl -sL https://deb.nodesource.com/setup_18.x | bash - && \
-    apt-get install -y --no-install-recommends nodejs && \
-    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/*
+ENV GIT_PYTHON_REFRESH=quiet
 
-# Клонируем репозиторий Hikka
-RUN git clone https://github.com/Plovchikdeval/Heroku /Hikka
 
-# Устанавливаем зависимости Python
-RUN pip3 install --no-warn-script-location --no-cache-dir -r /Hikka/requirements.txt
 
-# Устанавливаем рабочую директорию
-WORKDIR /Hikka
+ENV PIP_NO_CACHE_DIR=1 \
 
-# Устанавливаем переменные окружения для работы приложения
-ENV DOCKER=true \
-    IS_DJHOST=true \
-    rate=basic \
-    GIT_PYTHON_REFRESH=quiet \
-    PIP_NO_CACHE_DIR=1
+    PYTHONUNBUFFERED=1 \
 
-# Открываем порт 8080 для доступа к приложению
+    PYTHONDONTWRITEBYTECODE=1
+
+
+
+RUN apt update && apt install libcairo2 git build-essential -y --no-install-recommends
+
+RUN rm -rf /var/lib/apt/lists /var/cache/apt/archives /tmp/*
+
+
+
+RUN mkdir /data
+
+
+
+RUN git clone https://github.com/Plovchikdeval/Heroku /Heroku
+
+WORKDIR /Heroku
+
+
+
+RUN pip install --no-warn-script-location --no-cache-dir -U -r requirements.txt
+
+
+
 EXPOSE 8080
 
-# Определяем команду запуска приложения
-CMD ["python3", "-m", "hikka"]
+
+
+CMD python -m hikka
