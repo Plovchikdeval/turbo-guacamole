@@ -1,7 +1,7 @@
 FROM python:3.10-slim
 
 ENV DOCKER=true
-ENV DJ_HOST=true
+ENV IS_DJHOST=true
 ENV GIT_PYTHON_REFRESH=quiet
 
 ENV PIP_NO_CACHE_DIR=1 \
@@ -26,10 +26,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
 RUN mkdir /data
 
 # Клонирование репозитория и переключение на ветку master с rebase
-RUN git clone https://github.com/Plovchikdeval/Heroku /Heroku && \
-    cd /Heroku && \
-    git checkout master && \
-    git pull --rebase origin master
+RUN git clone https://github.com/coddrago/Heroku /Heroku
 
 # Установка рабочей директории
 WORKDIR /Heroku
