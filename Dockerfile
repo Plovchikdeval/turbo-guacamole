@@ -1,5 +1,6 @@
 FROM python:3.10-slim
 
+# Установка переменных окружения
 ENV DOCKER=true
 ENV IS_DJHOST=true
 ENV GIT_PYTHON_REFRESH=quiet
@@ -25,13 +26,11 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
 # Создание директории для данных
 RUN mkdir /data
 
-# Клонирование репозитория и переключение на ветку master с rebase
+# Клонирование репозитория
 RUN git clone https://github.com/coddrago/Heroku /Heroku
 
 # Установка рабочей директории
 WORKDIR /Heroku
-
-RUN git pull origin main
 
 # Установка зависимостей Python
 RUN pip install --no-warn-script-location --no-cache-dir -U -r requirements.txt
@@ -39,5 +38,5 @@ RUN pip install --no-warn-script-location --no-cache-dir -U -r requirements.txt
 # Указание порта
 EXPOSE 8080
 
-# Команда для запуска приложения
-CMD python -m hikka
+# Команда для запуска приложения с обновлением репозитория
+CMD sh -c "git pull origin main && python -m hikka"
