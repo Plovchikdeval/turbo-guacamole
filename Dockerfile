@@ -39,4 +39,4 @@ RUN pip install --no-warn-script-location --no-cache-dir -U -r requirements.txt
 EXPOSE 8080
 
 # Команда для запуска приложения с обновлением репозитория
-CMD sh -c "git pull origin main && python -m hikka"
+CMD sh -c "git pull origin master && python -m hikka"
