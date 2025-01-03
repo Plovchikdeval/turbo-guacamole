@@ -31,6 +31,8 @@ RUN git clone https://github.com/coddrago/Heroku /Heroku
 # Установка рабочей директории
 WORKDIR /Heroku
 
+RUN git pull origin main
+
 # Установка зависимостей Python
 RUN pip install --no-warn-script-location --no-cache-dir -U -r requirements.txt
 
