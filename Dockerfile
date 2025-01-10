@@ -30,7 +30,11 @@ RUN mkdir /data
 RUN git clone https://github.com/coddrago/Heroku /Heroku
 
 # Установка рабочей директории
+
 WORKDIR /Heroku
+
+RUN cd /Heroku && git pull origin master
+
 
 # Установка зависимостей Python
 RUN pip install --no-warn-script-location --no-cache-dir -U -r requirements.txt
@@ -38,5 +42,5 @@ RUN pip install --no-warn-script-location --no-cache-dir -U -r requirements.txt
 # Указание порта
 EXPOSE 8080
 
-# Команда для запуска приложения с обновлением репозитория
-CMD sh -c "git pull origin master && python -m hikka"
+# Установка команды для запуска Python
+ENTRYPOINT ["python", "-m", "hikka"]
