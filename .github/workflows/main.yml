@@ -72,4 +72,4 @@ jobs:
 
           push: true
 
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/djhost:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/skirihost:latest
