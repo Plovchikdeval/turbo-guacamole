@@ -31,4 +31,5 @@ RUN pip install --no-warn-script-location --no-cache-dir -U -r requirements.txt
 EXPOSE 8080
 
 # Стартовая команда: git pull --rebase и запуск Python
-ENTRYPOINT ["python -m hikka"]
+CMD ["python", "-m", "hikka"]
+
