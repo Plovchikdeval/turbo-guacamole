@@ -19,10 +19,10 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/*
 
 # Клонирование репозитория
-RUN git clone https://github.com/coddrago/Heroku /Heroku
+RUN git clone https://github.com/Hikariatama/Hikka /Hikka
 
 # Установка рабочей директории
-WORKDIR /Heroku
+WORKDIR /Hikka
 
 # Установка зависимостей Python
 RUN pip install --no-warn-script-location --no-cache-dir -U -r requirements.txt
@@ -31,4 +31,4 @@ RUN pip install --no-warn-script-location --no-cache-dir -U -r requirements.txt
 EXPOSE 8080
 
 # Стартовая команда: git pull --rebase и запуск Python
-ENTRYPOINT ["/bin/bash", "-c", "git pull --rebase origin master && exec python -m hikka"]
+ENTRYPOINT ["python -m hikka"]
