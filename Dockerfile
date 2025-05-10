@@ -1,22 +1,24 @@
-FROM python:3.10-slim
+FROM alpine:latest
 
 # Установка переменной окружения
 ENV DOCKER=true
 
-# Установка необходимых зависимостей
-RUN apt update && apt install -y --no-install-recommends \
-    libcairo2 \
+# Установка зависимостей и Python 3.10
+RUN apk update && apk add --no-cache \
+    build-base \
+    python3 \
+    python3-dev \
+    py3-pip \
     git \
-    build-essential \
+    cairo-dev \
     ffmpeg \
     curl \
     bash \
-    && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/*
+    nodejs \
+    npm
 
-# Установка Node.js 18
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
-    apt install -y nodejs && \
-    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/*
+# Символическая ссылка для python и обновление pip
+RUN ln -sf python3 /usr/bin/python && pip install --upgrade pip
 
 # Клонирование репозитория
 RUN git clone https://github.com/Hikariatama/Hikka /Hikka
@@ -25,11 +27,10 @@ RUN git clone https://github.com/Hikariatama/Hikka /Hikka
 WORKDIR /Hikka
 
 # Установка зависимостей Python
-RUN pip install --no-warn-script-location --no-cache-dir -U -r requirements.txt
+RUN pip install --no-cache-dir --no-warn-script-location -U -r requirements.txt
 
 # Указание порта
 EXPOSE 8080
 
-# Стартовая команда: git pull --rebase и запуск Python
+# Стартовая команда
 CMD ["python", "-m", "hikka"]
-
