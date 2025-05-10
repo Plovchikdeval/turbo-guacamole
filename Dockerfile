@@ -17,8 +17,8 @@ RUN apk update && apk add --no-cache \
     nodejs \
     npm
 
-# Символическая ссылка для python и обновление pip
-RUN ln -sf python3 /usr/bin/python && pip install --upgrade pip
+# Символические ссылки для python и pip
+RUN ln -sf python3 /usr/bin/python && ln -sf pip3 /usr/bin/pip
 
 # Клонирование репозитория
 RUN git clone https://github.com/Hikariatama/Hikka /Hikka
