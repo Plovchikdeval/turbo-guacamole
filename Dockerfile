@@ -1,9 +1,10 @@
 FROM alpine:latest
 
-# Установка переменной окружения
+# Установка переменных окружения
 ENV DOCKER=true
+ENV AIOHTTP_NO_EXTENSIONS=1
 
-# Установка зависимостей и Python 3.10
+# Установка зависимостей
 RUN apk update && apk add --no-cache \
     build-base \
     python3 \
@@ -17,7 +18,7 @@ RUN apk update && apk add --no-cache \
     nodejs \
     npm
 
-# Символические ссылки для python и pip
+# Символические ссылки
 RUN ln -sf python3 /usr/bin/python && ln -sf pip3 /usr/bin/pip
 
 # Клонирование репозитория
@@ -27,7 +28,7 @@ RUN git clone https://github.com/Hikariatama/Hikka /Hikka
 WORKDIR /Hikka
 
 # Установка зависимостей Python
-RUN pip install --no-cache-dir --no-warn-script-location -U -r requirements.txt
+RUN pip install --no-cache-dir --no-warn-script-location --break-system-packages -U -r requirements.txt
 
 # Указание порта
 EXPOSE 8080
