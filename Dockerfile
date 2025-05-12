@@ -1,7 +1,7 @@
 # Базовый образ Ubuntu 22.04
 FROM ubuntu:22.04
 
-# Установка переменной окружения
+# Установка переменных окружения
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DOCKER=true
 ENV AIOHTTP_NO_EXTENSIONS=1
@@ -24,21 +24,21 @@ RUN apt update && apt install -y --no-install-recommends \
     npm \
     && rm -rf /var/lib/apt/lists/*
 
-# Символическая ссылка для python
-RUN ln -s /usr/bin/python3.10 /usr/bin/python && \
-    ln -s /usr/bin/pip3 /usr/bin/pip && \
+# Создание символических ссылок, если они ещё не существуют
+RUN [ ! -e /usr/bin/python ] && ln -s /usr/bin/python3.10 /usr/bin/python || true && \
+    [ ! -e /usr/bin/pip ] && ln -s /usr/bin/pip3 /usr/bin/pip || true && \
     pip install --upgrade pip
 
 # Клонирование репозитория
 RUN git clone https://github.com/Crayz310/Legacy /Legacy
 
-# Переход в рабочую директорию
+# Установка рабочей директории
 WORKDIR /Legacy
 
 # Установка Python-зависимостей
 RUN pip install --no-warn-script-location --no-cache-dir -U -r requirements.txt
 
-# Открываем порт
+# Открытие порта
 EXPOSE 8080
 
 # Команда запуска
