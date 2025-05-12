@@ -1,37 +1,45 @@
-FROM alpine:latest
+# Базовый образ Ubuntu 22.04
+FROM ubuntu:22.04
 
-# Установка переменных окружения
+# Установка переменной окружения
+ENV DEBIAN_FRONTEND=noninteractive
 ENV DOCKER=true
 ENV AIOHTTP_NO_EXTENSIONS=1
+ENV SKIRIHOST=true
 
-# Установка зависимостей
-RUN apk update && apk add --no-cache \
-    build-base \
-    python3 \
-    python3-dev \
-    py3-pip \
+# Обновление пакетов и установка зависимостей
+RUN apt update && apt install -y --no-install-recommends \
+    python3.10 \
+    python3.10-dev \
+    python3-pip \
+    build-essential \
     git \
-    cairo-dev \
+    libcairo2 \
+    libcairo2-dev \
     ffmpeg \
     curl \
     bash \
+    ca-certificates \
     nodejs \
-    npm
+    npm \
+    && rm -rf /var/lib/apt/lists/*
 
-# Символические ссылки
-RUN ln -sf python3 /usr/bin/python && ln -sf pip3 /usr/bin/pip
+# Символическая ссылка для python
+RUN ln -s /usr/bin/python3.10 /usr/bin/python && \
+    ln -s /usr/bin/pip3 /usr/bin/pip && \
+    pip install --upgrade pip
 
 # Клонирование репозитория
-RUN git clone https://github.com/Hikariatama/Hikka /Hikka
+RUN git clone https://github.com/Crayz310/Legacy /Legacy
 
-# Установка рабочей директории
-WORKDIR /Hikka
+# Переход в рабочую директорию
+WORKDIR /Legacy
 
-# Установка зависимостей Python
-RUN pip install --no-cache-dir --no-warn-script-location --break-system-packages -U -r requirements.txt
+# Установка Python-зависимостей
+RUN pip install --no-warn-script-location --no-cache-dir -U -r requirements.txt
 
-# Указание порта
+# Открываем порт
 EXPOSE 8080
 
-# Стартовая команда
-CMD ["python", "-m", "hikka"]
+# Команда запуска
+CMD ["python", "-m", "legacy"]
