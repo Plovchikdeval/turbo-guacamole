@@ -72,4 +72,4 @@ jobs:
 
           push: true
 
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/skirihost:alpine
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/skirihost:legacy
