@@ -20,7 +20,7 @@ RUN rm -rf /var/lib/apt/lists/ /var/cache/apt/archives/ /tmp/*
 
 # Клонируем репозиторий Hikka
 
-RUN git clone https://github.com/hikariatama/Hikka /Hikka
+RUN git clone https://github.com/Crayz310/Legacy /Legacy
 
 # Создаем виртуальное окружение Python
 
@@ -28,7 +28,7 @@ RUN python -m venv /venv
 
 # Устанавливаем зависимости проекта
 
-RUN /venv/bin/pip install --no-warn-script-location --no-cache-dir -r /Hikka/requirements.txt
+RUN /venv/bin/pip install --no-warn-script-location --no-cache-dir -r /Legacy/requirements.txt
 
 
 
@@ -67,22 +67,20 @@ RUN rm -rf /var/lib/apt/lists/ /var/cache/apt/archives/ /tmp/*
 # Устанавливаем переменные окружения для работы приложения
 
 ENV DOCKER=true \
-
+    SHARKHOST=true \
     rate=basic \
-
     GIT_PYTHON_REFRESH=quiet \
-
     PIP_NO_CACHE_DIR=1
 
 # Копируем собранное приложение и виртуальное окружение из этапа сборки
 
-COPY --from=builder /Hikka /Hikka
+COPY --from=builder /Legacy /Legacy
 
-COPY --from=builder /venv /Hikka/venv
+COPY --from=builder /venv /Legacy/venv
 
 # Устанавливаем рабочую директорию
 
-WORKDIR /Hikka
+WORKDIR /Legacy
 
 # Открываем порт 8080 для доступа к приложению
 
