@@ -1,93 +1,16 @@
-# -------------------------------
+FROM ubuntu:latest
+ENV SHARKHOST=true
+WORKDIR /Foxuserbot
+COPY . /Foxuserbot
 
-# Используем образ python:3.10-slim как базовый для этапа сборки
+RUN apt-get update && apt-get install -y python3 python3-pip python3-venv wget unzip curl openssh-client
+RUN python3 -m venv venv
+RUN . venv/bin/activate && pip install --upgrade pip
+# Копируем скрипт запуска
+COPY fox /Foxuserbot/fox.sh
 
-FROM python:3.10-slim as builder
+# Делаем его исполняемым
+RUN chmod +x /Foxuserbot/fox.sh
 
-# Отключаем кэширование pip, чтобы уменьшить размер образа
-
-ENV PIP_NO_CACHE_DIR=1
-
-# Устанавливаем необходимые пакеты для сборки Python пакетов и git
-
-RUN apt-get update && \
-
-    apt-get install -y --fix-missing --no-install-recommends git python3-dev gcc
-
-# Очищаем кэш apt для уменьшения размера образа
-
-RUN rm -rf /var/lib/apt/lists/ /var/cache/apt/archives/ /tmp/*
-
-# Клонируем репозиторий Hikka
-
-RUN git clone https://github.com/Crayz310/Legacy /Legacy
-
-# Создаем виртуальное окружение Python
-
-RUN python -m venv /venv
-
-# Устанавливаем зависимости проекта
-
-RUN /venv/bin/pip install --no-warn-script-location --no-cache-dir -r /Legacy/requirements.txt
-
-
-
-# -------------------------------
-
-# Используем другой базовый образ для финального контейнера
-
-FROM python:3.10-slim
-
-# Устанавливаем необходимые пакеты для работы приложения
-
-RUN apt-get update && \
-
-    apt-get install -y --no-install-recommends --fix-missing \
-
-    curl libcairo2 git ffmpeg libmagic1 \
-
-    libavcodec-dev libavutil-dev libavformat-dev \
-
-    libswscale-dev libavdevice-dev neofetch wkhtmltopdf gcc python3-dev
-
-# Устанавливаем Node.js
-
-RUN curl -sL https://deb.nodesource.com/setup_18.x -o nodesource_setup.sh && \
-
-    bash nodesource_setup.sh && \
-
-    apt-get install -y nodejs && \
-
-    rm nodesource_setup.sh
-
-# Очищаем кэш apt для уменьшения размера образа
-
-RUN rm -rf /var/lib/apt/lists/ /var/cache/apt/archives/ /tmp/*
-
-# Устанавливаем переменные окружения для работы приложения
-
-ENV DOCKER=true \
-    SHARKHOST=true \
-    rate=basic \
-    GIT_PYTHON_REFRESH=quiet \
-    PIP_NO_CACHE_DIR=1
-
-# Копируем собранное приложение и виртуальное окружение из этапа сборки
-
-COPY --from=builder /Legacy /Legacy
-
-COPY --from=builder /venv /Legacy/venv
-
-# Устанавливаем рабочую директорию
-
-WORKDIR /Legacy
-
-# Открываем порт 8080 для доступа к приложению
-
-EXPOSE 8080
-
-
-
-# Определяем команду запуска приложения
-
-CMD ["python3", "-m", "legacy"]
+# Обновляем команду запуска
+CMD ["/Foxuserbot/fox.sh"]
