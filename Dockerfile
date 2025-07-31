@@ -1,95 +1,30 @@
-# -------------------------------
-
-# Используем образ python:3.10-slim как базовый для этапа сборки
-
-FROM python:3.10-slim as builder
-
-# Отключаем кэширование pip, чтобы уменьшить размер образа
-
-ENV PIP_NO_CACHE_DIR=1
-
-# Устанавливаем необходимые пакеты для сборки Python пакетов и git
-
-RUN apt-get update && \
-
-    apt-get install -y --fix-missing --no-install-recommends git python3-dev gcc
-
-# Очищаем кэш apt для уменьшения размера образа
-
-RUN rm -rf /var/lib/apt/lists/ /var/cache/apt/archives/ /tmp/*
-
-# Клонируем репозиторий Hikka
-
-RUN git clone https://github.com/Coddrago/Heroku /Heroku
-
-# Создаем виртуальное окружение Python
-
-RUN python -m venv /venv
-
-# Устанавливаем зависимости проекта
-
-RUN /venv/bin/pip install --no-warn-script-location --no-cache-dir -r /Heroku/requirements.txt
-
-
-
-# -------------------------------
-
-# Используем другой базовый образ для финального контейнера
-
 FROM python:3.10-slim
-
-# Устанавливаем необходимые пакеты для работы приложения
-
-RUN apt-get update && \
-
-    apt-get install -y --no-install-recommends --fix-missing \
-
-    curl libcairo2 git ffmpeg libmagic1 \
-
-    libavcodec-dev libavutil-dev libavformat-dev \
-
-    libswscale-dev libavdevice-dev neofetch wkhtmltopdf gcc python3-dev
-
-# Устанавливаем Node.js
-
-RUN curl -sL https://deb.nodesource.com/setup_18.x -o nodesource_setup.sh && \
-
-    bash nodesource_setup.sh && \
-
-    apt-get install -y nodejs && \
-
-    rm nodesource_setup.sh
-
-# Очищаем кэш apt для уменьшения размера образа
-
-RUN rm -rf /var/lib/apt/lists/ /var/cache/apt/archives/ /tmp/*
-
-# Устанавливаем переменные окружения для работы приложения
 
 ENV DOCKER=true \
     SHARKHOST=true \
-    rate=basic \
     GIT_PYTHON_REFRESH=quiet \
     PIP_NO_CACHE_DIR=1
 
-# Копируем собранное приложение и виртуальное окружение из этапа сборки
+RUN apt update && \
+    apt install -y --no-install-recommends \
+        curl libcairo2 git ffmpeg \
+        libavcodec-dev libavutil-dev libavformat-dev libswscale-dev libavdevice-dev \
+        gcc python3-dev
 
-COPY --from=builder /Heroku /Heroku
 
-COPY --from=builder /venv /Heroku/venv
+RUN curl -sL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs
 
-# Устанавливаем рабочую директорию
+RUN rm -rf /var/lib/apt/lists /var/cache/apt/archives /tmp/*
+
+RUN git clone https://github.com/coddrago/Heroku /Heroku
 
 WORKDIR /Heroku
 
-# Открываем порт 8080 для доступа к приложению
+RUN pip install --no-warn-script-location --no-cache-dir -r requirements.txt
 
 EXPOSE 8080
-# Копируем скрипт запуска
-COPY Heroku.sh /Heroku/entrypoint.sh
 
-# Делаем его исполняемым
-RUN chmod +x /Heroku/entrypoint.sh
+RUN mkdir /data
 
-# Обновляем команду запуска
-CMD ["/Heroku/entrypoint.sh"]
+CMD ["python3", "-m", "heroku"]
