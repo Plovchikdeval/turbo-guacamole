@@ -20,7 +20,7 @@ jobs:
       - name: Get latest commit from Coddrago/Heroku
         id: getcommit
         run: |
-          LATEST=$(curl -s https://api.github.com/repos/Coddrago/Heroku/commits/main | jq -r .sha)
+          LATEST=$(curl -s https://api.github.com/repos/Coddrago/Heroku/commits/master | jq -r .sha)
           echo "latest_commit=$LATEST" >> $GITHUB_OUTPUT
           echo "$LATEST" > latest.txt
 
