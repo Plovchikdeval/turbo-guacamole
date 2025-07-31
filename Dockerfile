@@ -81,13 +81,13 @@ COPY --from=builder /venv /Legacy/venv
 # Устанавливаем рабочую директорию
 
 WORKDIR /Legacy
+# Копируем скрипт запуска
+COPY Legacy.sh /Legacy/entrypoint.sh
 
-# Открываем порт 8080 для доступа к приложению
+# Делаем его исполняемым
+RUN chmod +x /Legacy/entrypoint.sh
 
 EXPOSE 8080
 
-
-
-# Определяем команду запуска приложения
-
-CMD ["python3", "-m", "legacy"]
+# Обновляем команду запуска
+CMD ["/Legacy/entrypoint.sh"]
