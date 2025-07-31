@@ -20,7 +20,7 @@ RUN rm -rf /var/lib/apt/lists/ /var/cache/apt/archives/ /tmp/*
 
 # Клонируем репозиторий Hikka
 
-RUN git clone https://github.com/Crayz310/Legacy /Legacy
+RUN git clone https://github.com/Coddrago/Heroku /Heroku
 
 # Создаем виртуальное окружение Python
 
@@ -28,7 +28,7 @@ RUN python -m venv /venv
 
 # Устанавливаем зависимости проекта
 
-RUN /venv/bin/pip install --no-warn-script-location --no-cache-dir -r /Legacy/requirements.txt
+RUN /venv/bin/pip install --no-warn-script-location --no-cache-dir -r /Heroku/requirements.txt
 
 
 
@@ -74,20 +74,22 @@ ENV DOCKER=true \
 
 # Копируем собранное приложение и виртуальное окружение из этапа сборки
 
-COPY --from=builder /Legacy /Legacy
+COPY --from=builder /Heroku /Heroku
 
-COPY --from=builder /venv /Legacy/venv
+COPY --from=builder /venv /Heroku/venv
 
 # Устанавливаем рабочую директорию
 
-WORKDIR /Legacy
+WORKDIR /Heroku
 
 # Открываем порт 8080 для доступа к приложению
 
 EXPOSE 8080
+# Копируем скрипт запуска
+COPY Heroku.sh /Heroku/entrypoint.sh
 
+# Делаем его исполняемым
+RUN chmod +x /Heroku/entrypoint.sh
 
-
-# Определяем команду запуска приложения
-
-CMD ["python3", "-m", "legacy"]
+# Обновляем команду запуска
+CMD ["/Heroku/entrypoint.sh"]
