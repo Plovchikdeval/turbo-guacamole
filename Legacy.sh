@@ -13,4 +13,4 @@ else
 fi
 
 # Запускаем основное приложение
-exec python3 -m legacy
+exec pip install -r r*.txt && python3 -m legacy
