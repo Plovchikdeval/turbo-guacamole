@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y python3 python3-pip python3-venv wget u
 RUN python3 -m venv venv
 RUN . venv/bin/activate && pip install --upgrade pip
 # Копируем скрипт запуска
-COPY fox /Foxuserbot/fox.sh
+COPY fox.sh /Foxuserbot/fox.sh
 
 # Делаем его исполняемым
 RUN chmod +x /Foxuserbot/fox.sh
