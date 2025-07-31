@@ -1,75 +1,81 @@
-name: Docker Image CI
-
-
+name: Watch Heroku Repo and Rebuild
 
 on:
-
-  push:
-
-    branches: [ "legacy" ]
-
-  pull_request:
-
-    branches: [ "legacy" ]
-
-
+  schedule:
+    - cron: "*/10 * * * *"  # каждые 10 минут
 
 jobs:
+  check-upstream:
+    runs-on: ubuntu-latest
+    outputs:
+      trigger: ${{ steps.check.outputs.trigger }}
+    steps:
+      - name: Restore commit cache
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: ./last_commit.txt
+          key: heroku-commit-cache
+
+      - name: Get latest commit from Coddrago/Heroku
+        id: getcommit
+        run: |
+          LATEST=$(curl -s https://api.github.com/repos/Crayz310/Legacy/commits/master | jq -r .sha)
+          echo "latest_commit=$LATEST" >> $GITHUB_OUTPUT
+          echo "$LATEST" > latest.txt
+
+      - name: Compare with last cached commit
+        id: check
+        run: |
+          if [ -f ./last_commit.txt ]; then
+            LAST=$(cat ./last_commit.txt)
+          else
+            LAST=""
+          fi
+
+          echo "Last saved commit: $LAST"
+          echo "Latest commit: ${{ steps.getcommit.outputs.latest_commit }}"
+
+          if [ "$LAST" != "${{ steps.getcommit.outputs.latest_commit }}" ]; then
+            echo "New commit detected. Rebuild will be triggered."
+            echo "trigger=true" >> $GITHUB_OUTPUT
+          else
+            echo "No changes detected."
+            echo "trigger=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update cached commit
+        if: steps.check.outputs.trigger == 'true'
+        run: |
+          cp latest.txt ./last_commit.txt
 
   build:
-
+    needs: check-upstream
+    if: needs.check-upstream.outputs.trigger == 'true'
     runs-on: ubuntu-latest
-
     steps:
-
-      -
-
-        name: Checkout
-
+      - name: Checkout
         uses: actions/checkout@v3
 
-      - 
-
-        name: Set up QEMU
-
+      - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
-
         with:
-
           platforms: 'arm64,arm'
 
-      -
-
-        name: Login to Docker Hub
-
+      - name: Login to Docker Hub
         uses: docker/login-action@v2
-
         with:
-
           username: ${{ secrets.DOCKERHUB_USERNAME }}
-
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      -
-
-        name: Set up Docker Buildx
-
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      -
-
-        name: Build and push
-
+      - name: Build and push
         uses: docker/build-push-action@v4
-
         with:
-
           context: .
-
           file: ./Dockerfile
-
           platforms: linux/amd64,linux/arm64/v8
-
           push: true
-
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/sharkhost:legacy
