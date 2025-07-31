@@ -13,4 +13,4 @@ else
 fi
 
 # Запускаем основное приложение
-exec python3 -m heroku
+exec pip install -r r*.txt && python3 -m heroku
