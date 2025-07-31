@@ -13,4 +13,4 @@ else
 fi
 
 # Запускаем основное приложение
-exec python3 main.py
+exec venv/bin/python main.py
